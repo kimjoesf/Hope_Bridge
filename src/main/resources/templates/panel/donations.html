@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('My donations', ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <h1>My donations</h1>
+            <p>Every gift you've made, with its official receipt ready to print.</p>
+        </div>
+        <a href="/donate" class="btn btn-accent"><svg class="icon"><use href="#i-heart"></use></svg>New donation</a>
+    </div>
+
+    <div class="grid grid-3" style="margin-bottom:1.25rem">
+        <div class="stat">
+            <div class="stat-icon"><svg class="icon"><use href="#i-heart"></use></svg></div>
+            <div class="stat-value" th:text="${fmt.money(summary.lifetimeGiving)}">$1,466</div>
+            <div class="stat-label">Lifetime giving (tax-deductible)</div>
+        </div>
+        <div class="stat coral">
+            <div class="stat-icon"><svg class="icon"><use href="#i-gift"></use></svg></div>
+            <div class="stat-value" th:text="${summary.donationCount}">4</div>
+            <div class="stat-label">Gifts made</div>
+        </div>
+        <div class="card card-body tier-card">
+            <div class="row-between"><span class="label">Recognition tier</span><span th:replace="~{fragments/ui :: tier(${summary.tier})}"></span></div>
+            <div class="tier-progress" th:if="${summary.nextTier != null}">
+                <div class="small">
+                    <span th:text="${fmt.money(summary.amountToNextTier)} + ' to ' + ${summary.nextTier.label}">$533 to Gold</span>
+                    <span th:text="${summary.progressToNextTier} + '%'">62%</span>
+                </div>
+                <div th:replace="~{fragments/ui :: progress(${summary.progressToNextTier}, '')}"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap" th:unless="${#lists.isEmpty(donations)}">
+            <table class="table">
+                <thead>
+                <tr><th>Receipt</th><th>Cause</th><th>Method</th><th>Status</th><th class="num">Total impact</th><th class="num">Deductible</th><th></th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="donation : ${donations}">
+                    <td>
+                        <div class="mono strong small" th:text="${donation.receiptNumber}">HB-2026-000001</div>
+                        <div class="tiny muted" th:text="${fmt.date(donation.createdAt)}">Oct 2, 2026</div>
+                    </td>
+                    <td>
+                        <div class="strong" th:text="${donation.campaignTitle} ?: ${donation.categoryName}">Winter Meals</div>
+                        <div class="row wrap" style="gap:.3rem;margin-top:.3rem">
+                            <span class="badge badge-emerald plain" th:each="addOn : ${fmt.humanizeList(donation.addOns)}" th:text="${addOn}">Cover fees</span>
+                        </div>
+                    </td>
+                    <td><span class="chip"><svg class="icon"><use th:href="|#i-${fmt.icon(donation.method)}|"></use></svg><span th:text="${fmt.humanize(donation.method)}">Online</span></span></td>
+                    <td><span th:replace="~{fragments/ui :: status(${donation.status})}"></span></td>
+                    <td class="num strong" th:text="${fmt.money(donation.totalAmount)}">$257.50</td>
+                    <td class="num muted" th:text="${fmt.money(donation.taxDeductibleAmount)}">$257.50</td>
+                    <td class="actions">
+                        <a th:href="@{/panel/donations/receipt(id=${donation.id})}" class="btn btn-sm"><svg class="icon"><use href="#i-receipt"></use></svg>Receipt</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <th:block th:if="${#lists.isEmpty(donations)}">
+            <div th:replace="~{fragments/ui :: empty('heart', 'No donations yet', 'When you give, your receipts will be kept safe right here.')}"></div>
+        </th:block>
+    </div>
+</section>
+</body>
+</html>

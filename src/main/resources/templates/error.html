@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/public :: layout('Oops', ~{::main})}">
+<body>
+<main class="site-main error-page">
+    <div th:switch="${status}">
+        <div class="error-code" th:text="${status}">404</div>
+
+        <th:block th:case="403">
+            <h1>This page isn't open to you</h1>
+            <p class="lead" th:text="${#strings.isEmpty(detail) ? 'Your account does not have access to this area. If you think it should, please contact our team.' : detail}">No access.</p>
+        </th:block>
+        <th:block th:case="500">
+            <h1>Something went wrong on our side</h1>
+            <p class="lead">We hit an unexpected problem. Please try again in a moment - our team has been told.</p>
+        </th:block>
+        <th:block th:case="*">
+            <h1>We couldn't find that page</h1>
+            <p class="lead">The link may be old or mistyped. Let's get you back on track.</p>
+        </th:block>
+
+        <div class="row" style="justify-content:center">
+            <a href="/" class="btn btn-primary"><svg class="icon"><use href="#i-home"></use></svg>Back to home</a>
+            <a href="/panel" class="btn">Go to my panel</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

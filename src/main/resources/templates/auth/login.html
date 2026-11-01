@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/auth :: layout('Sign in', ~{::article})}">
+<body>
+<article class="auth-card rise">
+    <span class="eyebrow">Welcome back</span>
+    <h1 style="margin-top:.8rem">Sign in to HopeBridge</h1>
+    <p class="lead">Pick up where you left off: your gifts, your hours and your messages are waiting.</p>
+
+    <form method="post" action="/login" class="form">
+        <input th:replace="~{fragments/ui :: csrf}">
+        <input type="hidden" name="next" th:value="${next}">
+        <div class="field">
+            <label class="label" for="email">Email</label>
+            <input class="input" id="email" name="email" type="email" autocomplete="email" required autofocus
+                   th:value="${old['email']}" placeholder="you@example.com">
+        </div>
+        <div class="field">
+            <label class="label" for="password">Password</label>
+            <input class="input" id="password" name="password" type="password" autocomplete="current-password" required placeholder="Your password">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Sign in<svg class="icon"><use href="#i-arrow"></use></svg></button>
+    </form>
+
+    <p class="auth-switch">New here? <a href="/register">Create a free account</a></p>
+
+    <div class="demo-accounts">
+        <strong>Demo accounts &middot; password <code>Hope@2026</code></strong>
+        <div><code>staff@hopebridge.org</code> &middot; <code>donor@hopebridge.org</code> &middot; <code>volunteer@hopebridge.org</code></div>
+    </div>
+</article>
+</body>
+</html>

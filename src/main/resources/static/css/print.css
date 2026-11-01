@@ -1,0 +1,18 @@
+/* =================================================================
+   HopeBridge design system - 5. print
+   Receipts and certificates print cleanly (or "Save as PDF") without
+   any of the screen chrome around them.
+   ================================================================= */
+@media print {
+    @page { margin: 12mm; }
+
+    body, .document-body { background: #fff !important; }
+    .no-print, .document-bar, .toast-stack, .site-header, .site-footer, .sidebar, .topbar { display: none !important; }
+
+    .sheet { width: 100%; margin: 0; box-shadow: none; border-radius: 0; }
+    .certificate { padding: 0; }
+
+    /* Keep the brand colors - browsers drop backgrounds by default */
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    *, *::before, *::after { animation: none !important; }
+}

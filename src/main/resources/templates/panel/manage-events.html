@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('Manage events', ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <h1>Manage events</h1>
+            <p>Publishing invites every volunteer; editing or reminding notifies everyone registered - on their own channel.</p>
+        </div>
+        <a href="/panel/manage/events/edit" class="btn btn-primary"><svg class="icon"><use href="#i-plus"></use></svg>New event</a>
+    </div>
+
+    <div class="card">
+        <div class="table-wrap" th:unless="${#lists.isEmpty(events)}">
+            <table class="table">
+                <thead><tr><th>Event</th><th>When</th><th>Registrations</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="event : ${events}">
+                    <td>
+                        <div class="row">
+                            <div th:replace="~{fragments/ui :: date-tile(${event.startsAt})}"></div>
+                            <div>
+                                <div class="strong" th:text="${event.title}">Event</div>
+                                <div class="tiny muted" th:text="${event.categoryName} + ' · ' + ${event.location}">Workshop · Place</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div th:text="${fmt.dateTime(event.startsAt)}">Sat</div>
+                        <span class="badge badge-neutral plain" th:if="${event.past}">Finished</span>
+                        <span class="tiny muted" th:if="${!event.past and event.updatedAt != null}" th:text="'Edited ' + ${fmt.timeAgo(event.updatedAt)}">Edited</span>
+                    </td>
+                    <td style="min-width:170px">
+                        <div class="small" style="display:flex;justify-content:space-between;margin-bottom:.35rem">
+                            <span class="strong" th:text="${event.registeredCount} + ' / ' + ${event.capacity}">5 / 30</span>
+                            <span class="muted" th:text="${event.seatsLeft} + ' left'">25 left</span>
+                        </div>
+                        <div th:replace="~{fragments/ui :: progress(${event.registeredCount * 100 / event.capacity}, 'coral thin')}"></div>
+                    </td>
+                    <td class="actions">
+                        <th:block th:unless="${event.past}">
+                            <form method="post" action="/panel/manage/events/remind"
+                                  th:attr="data-confirm='Send a reminder to everyone registered for ' + ${event.title} + '?'">
+                                <input th:replace="~{fragments/ui :: csrf}">
+                                <input type="hidden" name="eventId" th:value="${event.id}">
+                                <button type="submit" class="btn btn-sm" th:disabled="${event.registeredCount == 0}"><svg class="icon"><use href="#i-send"></use></svg>Remind</button>
+                            </form>
+                            <a th:href="@{/panel/manage/events/edit(id=${event.id})}" class="btn btn-sm"><svg class="icon"><use href="#i-edit"></use></svg>Edit</a>
+                        </th:block>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <th:block th:if="${#lists.isEmpty(events)}">
+            <div th:replace="~{fragments/ui :: empty('calendar', 'No events yet', 'Create the first one - volunteers will hear about it right away.')}"></div>
+        </th:block>
+    </div>
+</section>
+</body>
+</html>

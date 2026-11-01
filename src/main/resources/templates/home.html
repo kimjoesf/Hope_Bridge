@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/public :: layout('Bridging generosity and need', ~{::main})}">
+<body>
+<main class="site-main">
+
+    <!-- ============================================================ hero -->
+    <section class="hero">
+        <!-- <div class="hero-bg"><span></span><span></span><span></span></div> -->
+        <div class="container hero-grid">
+            <div>
+                <span class="eyebrow rise">Together since 2012</span>
+                <h1 class="rise rise-1">Bridging generosity <br>and <em>real need</em>.</h1>
+                <p class="lead rise rise-2">
+                    HopeBridge brings donors, volunteers and communities together. Give in seconds,
+                    lend your skills where they matter, and watch your impact grow.
+                </p>
+                <div class="hero-actions rise rise-3">
+                    <a href="/donate" class="btn btn-accent btn-lg"><svg class="icon"><use href="#i-heart"></use></svg>Give today</a>
+                    <a href="/register?role=VOLUNTEER" class="btn btn-lg"><svg class="icon"><use href="#i-hand"></use></svg>Volunteer with us</a>
+                </div>
+                <div class="hero-trust rise rise-3">
+                    <div class="avatar-stack">
+                        <span class="avatar">OK</span><span class="avatar">SH</span><span class="avatar">YN</span><span class="avatar">NF</span>
+                    </div>
+                    <span><strong th:text="${impact.donorCount}">6</strong> donors and counting - thank you.</span>
+                </div>
+            </div>
+
+            <div class="hero-visual" th:with="featured=${#lists.isEmpty(campaigns) ? null : campaigns[0]}">
+                <div class="hero-card" th:if="${featured != null}">
+                    <div class="cover">
+                        <span class="badge plain" th:text="${featured.categoryName}">Food Security</span>
+                    </div>
+                    <h3 th:text="${featured.title}">Winter Meals</h3>
+                    <p class="muted small" style="margin:.4rem 0 1.2rem" th:text="${featured.summary}">Summary</p>
+                    <div th:replace="~{fragments/ui :: progress(${featured.progressPercent}, '')}"></div>
+                    <div class="campaign-meta" style="margin-top:.75rem">
+                        <span><strong th:text="${fmt.money(featured.raisedAmount)}">$14,532</strong> raised</span>
+                        <span th:text="${featured.progressPercent} + '% of ' + ${fmt.compactMoney(featured.goalAmount)}">58% of $25K</span>
+                    </div>
+                </div>
+                <div class="hero-float one">
+                    <span class="stat-icon" style="margin:0"><svg class="icon"><use href="#i-trend"></use></svg></span>
+                    <div><strong th:text="${fmt.compactMoney(impact.totalRaised)}">$3.4K</strong><span>raised through HopeBridge</span></div>
+                </div>
+                <div class="hero-float two">
+                    <span class="stat-icon" style="margin:0;background:var(--coral-50);color:var(--coral-600)"><svg class="icon"><use href="#i-clock"></use></svg></span>
+                    <div><strong th:text="${fmt.number(impact.volunteerHours)} + ' hours'">21 hours</strong><span>given by volunteers</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="impact-strip">
+        <div class="container">
+            <div class="grid grid-4">
+                <div class="stat">
+                    <div class="stat-icon"><svg class="icon"><use href="#i-heart"></use></svg></div>
+                    <div class="stat-value" th:text="${fmt.compactMoney(impact.totalRaised)}">$3.4K</div>
+                    <div class="stat-label">Raised for our causes</div>
+                </div>
+                <div class="stat coral">
+                    <div class="stat-icon"><svg class="icon"><use href="#i-users"></use></svg></div>
+                    <div class="stat-value" th:text="${impact.donorCount}">6</div>
+                    <div class="stat-label">Generous donors</div>
+                </div>
+                <div class="stat amber">
+                    <div class="stat-icon"><svg class="icon"><use href="#i-clock"></use></svg></div>
+                    <div class="stat-value" th:text="${fmt.number(impact.volunteerHours)}">21</div>
+                    <div class="stat-label">Volunteer hours</div>
+                </div>
+                <div class="stat sky">
+                    <div class="stat-icon"><svg class="icon"><use href="#i-calendar"></use></svg></div>
+                    <div class="stat-value" th:text="${impact.upcomingEvents}">5</div>
+                    <div class="stat-label">Upcoming events</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================================= campaigns -->
+    <section class="section" id="campaigns">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Active campaigns</span>
+                    <h2 style="margin-top:.8rem">Choose where your gift goes</h2>
+                    <p class="lead">Every campaign has a clear goal. Watch the bar move as people like you give.</p>
+                </div>
+                <a href="/donate" class="btn">Give to where it's needed most<svg class="icon"><use href="#i-arrow"></use></svg></a>
+            </div>
+            <div class="grid grid-4">
+                <article class="card card-hover campaign" th:each="campaign : ${campaigns}">
+                    <div class="campaign-cover">
+                        <span class="icon-bubble"><svg class="icon icon-lg"><use href="#i-heart"></use></svg></span>
+                        <span class="badge plain" th:text="${campaign.categoryName}">Education</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 th:text="${campaign.title}">Campaign</h3>
+                        <p class="muted small" th:text="${campaign.summary}">Summary</p>
+                        <div>
+                            <div th:replace="~{fragments/ui :: progress(${campaign.progressPercent}, '')}"></div>
+                            <div class="campaign-meta" style="margin-top:.6rem">
+                                <span><strong th:text="${fmt.compactMoney(campaign.raisedAmount)}">$10K</strong> raised</span>
+                                <span th:text="'of ' + ${fmt.compactMoney(campaign.goalAmount)}">of $15K</span>
+                            </div>
+                        </div>
+                        <a th:href="@{/donate(campaign=${campaign.id})}" class="btn btn-primary btn-block">Support this campaign</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================== how it works -->
+    <section class="section-tight" id="how-it-works">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">How it works</span>
+                    <h2 style="margin-top:.8rem">Three ways to make a difference</h2>
+                </div>
+            </div>
+            <div class="grid grid-3 steps">
+                <div class="card step">
+                    <div class="stat-icon"><svg class="icon"><use href="#i-card"></use></svg></div>
+                    <h3>Give your way</h3>
+                    <p class="muted">Online in seconds, by check, or as goods like food and blankets. Cover the fees or get your employer to match it.</p>
+                </div>
+                <div class="card step">
+                    <div class="stat-icon" style="background:var(--coral-50);color:var(--coral-600)"><svg class="icon"><use href="#i-hand"></use></svg></div>
+                    <h3>Lend your skills</h3>
+                    <p class="muted">Tell us what you are good at and when you are free. Log your hours and earn a certificate of appreciation.</p>
+                </div>
+                <div class="card step">
+                    <div class="stat-icon" style="background:var(--amber-100);color:var(--warning)"><svg class="icon"><use href="#i-bell"></use></svg></div>
+                    <h3>Stay in the loop</h3>
+                    <p class="muted">Pick email, SMS or social media. Receipts, reminders and thank-yous arrive exactly the way you like them.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================== events -->
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Coming up</span>
+                    <h2 style="margin-top:.8rem">Join us in person</h2>
+                </div>
+                <a href="/events" class="btn">See all events<svg class="icon"><use href="#i-arrow"></use></svg></a>
+            </div>
+            <div class="card">
+                <div class="event-row" th:each="event : ${events}">
+                    <div th:replace="~{fragments/ui :: date-tile(${event.startsAt})}"></div>
+                    <div class="event-info">
+                        <span class="badge badge-emerald plain" th:text="${event.categoryName}">Workshop</span>
+                        <h3 style="margin-top:.45rem" th:text="${event.title}">Event</h3>
+                        <div class="event-meta">
+                            <span><svg class="icon"><use href="#i-clock"></use></svg><span th:text="${fmt.dateTime(event.startsAt)}">Sat 10:00</span></span>
+                            <span><svg class="icon"><use href="#i-pin"></use></svg><span th:text="${event.location}">Place</span></span>
+                        </div>
+                    </div>
+                    <div class="seats">
+                        <div class="small"><span class="muted">Seats left</span><strong th:text="${event.seatsLeft}">20</strong></div>
+                        <div th:replace="~{fragments/ui :: progress(${event.capacity == 0 ? 0 : event.registeredCount * 100 / event.capacity}, 'coral thin')}"></div>
+                    </div>
+                </div>
+                <th:block th:if="${#lists.isEmpty(events)}">
+                    <div th:replace="~{fragments/ui :: empty('calendar', 'No events scheduled', 'New events are announced here first - check back soon.')}"></div>
+                </th:block>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-tight" style="padding-bottom:5.5rem">
+        <div class="container">
+            <div class="cta-band">
+                <div>
+                    <h2>Your kindness has a <em>multiplier</em>.</h2>
+                    <p>Create a free account to track every gift, download tax receipts, register for events and choose how we keep in touch.</p>
+                </div>
+                <div class="actions">
+                    <a href="/register" class="btn btn-accent btn-lg">Create my account</a>
+                    <a href="/donate" class="btn btn-light btn-lg">Donate now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

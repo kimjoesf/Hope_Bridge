@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- An icon from the sprite in fragments/icons.html -->
+<svg th:fragment="icon(name)" class="icon" aria-hidden="true"><use th:href="|#i-${name}|"></use></svg>
+
+<!-- The hidden anti-forgery field every POST form needs -->
+<input th:fragment="csrf" type="hidden" name="_csrf" th:value="${csrf}">
+
+<!-- One-time success / error messages left by the controller before a redirect -->
+<div th:fragment="flash" class="toast-stack" th:if="${flash['success'] != null or flash['error'] != null}" role="status" aria-live="polite">
+    <div class="toast toast-success" th:if="${flash['success'] != null}">
+        <svg class="icon"><use href="#i-check-circle"></use></svg>
+        <p th:text="${flash['success']}">Saved.</p>
+        <button type="button" aria-label="Dismiss"><svg class="icon"><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="toast toast-error" th:if="${flash['error'] != null}">
+        <svg class="icon"><use href="#i-alert"></use></svg>
+        <p th:text="${flash['error']}">Something went wrong.</p>
+        <button type="button" aria-label="Dismiss"><svg class="icon"><use href="#i-x"></use></svg></button>
+    </div>
+</div>
+
+<!-- The colored badge for a donation status -->
+<span th:fragment="status(code)" class="badge" th:classappend="|badge-${fmt.statusTone(code)}|" th:text="${fmt.humanize(code)}">Confirmed</span>
+
+<!-- The metallic donor tier badge -->
+<span th:fragment="tier(tier)" class="tier" th:classappend="|tier-${#strings.toLowerCase(tier)}|">
+    <svg class="icon"><use href="#i-award"></use></svg><span th:text="${tier.label}">Gold</span>
+</span>
+
+<!-- A progress bar; percent is 0..100 -->
+<div th:fragment="progress(percent, tone)" class="progress" th:classappend="${tone}" role="progressbar"
+     th:attr="aria-valuenow=${percent}" aria-valuemin="0" aria-valuemax="100">
+    <span th:style="|width: ${percent}%|"></span>
+</div>
+
+<!-- Friendly placeholder when a list has nothing in it yet -->
+<div th:fragment="empty(iconName, title, text)" class="empty">
+    <div class="empty-icon"><svg class="icon"><use th:href="|#i-${iconName}|"></use></svg></div>
+    <h4 th:text="${title}">Nothing here yet</h4>
+    <p class="small" th:text="${text}">When there is something to show, it will appear here.</p>
+</div>
+
+<!-- The square calendar tile used for events -->
+<div th:fragment="date-tile(moment)" class="date-tile">
+    <span class="month" th:text="${fmt.month(moment)}">NOV</span>
+    <span class="day" th:text="${fmt.day(moment)}">14</span>
+</div>
+
+</body>
+</html>

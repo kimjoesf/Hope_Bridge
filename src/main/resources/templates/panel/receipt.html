@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/document :: layout(|Receipt ${donation.receiptNumber}|, '/panel/donations', 'My donations', ~{::article})}">
+<body>
+<article class="sheet rise">
+    <header class="receipt-head">
+        <div>
+            <a th:replace="~{fragments/nav :: brand}"></a>
+            <h1>Official donation receipt</h1>
+        </div>
+        <div class="receipt-number">
+            <span>Receipt number</span>
+            <strong th:text="${donation.receiptNumber}">HB-2026-000001</strong>
+            <span style="margin-top:.8rem">Issued</span>
+            <strong th:text="${fmt.date(donation.createdAt)}">Oct 2, 2026</strong>
+        </div>
+    </header>
+
+    <div class="receipt-body">
+        <div class="receipt-parties">
+            <div>
+                <h4>Received from</h4>
+                <div class="strong" th:text="${donation.donorName}">Omar Khaled</div>
+                <div class="muted small" th:text="${donation.donorEmail}">donor@hopebridge.org</div>
+            </div>
+            <div>
+                <h4>Received by</h4>
+                <div class="strong">HopeBridge Foundation</div>
+                <div class="muted small">12 Tahrir St, Cairo &middot; Registered non-profit No. NP-2012-0457</div>
+            </div>
+        </div>
+
+        <div class="receipt-section">
+            <h4>Gift details</h4>
+            <div class="receipt-lines">
+                <div class="line">
+                    <span>
+                        <span class="strong" th:text="${donation.description}">Monetary gift, processing fees covered</span><br>
+                        <span class="small muted" th:text="'Towards: ' + (${donation.campaignTitle} ?: ${donation.categoryName})">Towards</span>
+                    </span>
+                    <span th:replace="~{fragments/ui :: status(${donation.status})}"></span>
+                </div>
+                <div class="line"><span class="muted">Method</span><span th:text="${fmt.humanize(donation.method)}">Online</span></div>
+                <div class="line" th:if="${donation.checkNumber != null}"><span class="muted">Check number</span><span class="mono" th:text="${donation.checkNumber}">10457</span></div>
+                <div class="line" th:if="${donation.itemDescription != null}"><span class="muted">Items</span><span th:text="${donation.itemDescription}">Blankets</span></div>
+                <div class="line"><span class="muted">Reference</span><span class="mono" th:text="${donation.reference}">TXN-XXXX</span></div>
+                <div class="line"><span class="muted">Base gift</span><span th:text="${fmt.money(donation.baseAmount)}">$250.00</span></div>
+                <div class="line total"><span>Total impact</span><span th:text="${fmt.money(donation.totalAmount)}">$257.50</span></div>
+                <div class="line deductible"><span>Tax-deductible amount</span><span th:text="${fmt.money(donation.taxDeductibleAmount)}">$257.50</span></div>
+            </div>
+        </div>
+
+        <div class="tax-note">
+            <strong>Tax statement.</strong>
+            No goods or services were provided in exchange for this contribution. The tax-deductible amount reflects only
+            what you personally contributed - employer matching funds are receipted to your employer.
+            <th:block th:if="${donation.method == 'IN_KIND'}">For in-kind gifts, the value shown is the donor's good-faith estimate of fair market value.</th:block>
+            Please keep this receipt for your records.
+        </div>
+
+        <div class="receipt-foot">
+            <div class="small muted">Thank you for your generosity.<br>Questions? hello@hopebridge.org</div>
+            <div class="signature">
+                <div class="sig">Mariam Adel</div>
+                <div class="rule"></div>
+                <div class="tiny muted">Mariam Adel &middot; Director of Development</div>
+            </div>
+        </div>
+    </div>
+</article>
+</body>
+</html>

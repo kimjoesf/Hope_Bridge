@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('My hours', ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <h1>My volunteer hours</h1>
+            <p>Every hour counts - literally. Log your time and download your certificate whenever you like.</p>
+        </div>
+        <a href="/panel/certificate" class="btn btn-primary" th:if="${summary.hasHours()}"><svg class="icon"><use href="#i-award"></use></svg>My certificate</a>
+    </div>
+
+    <div class="grid grid-3" style="margin-bottom:1.25rem">
+        <div class="stat amber">
+            <div class="stat-icon"><svg class="icon"><use href="#i-clock"></use></svg></div>
+            <div class="stat-value" th:text="${fmt.number(summary.totalHours)}">15</div>
+            <div class="stat-label">Hours given</div>
+        </div>
+        <div class="stat">
+            <div class="stat-icon"><svg class="icon"><use href="#i-hand"></use></svg></div>
+            <div class="stat-value" th:text="${summary.shiftCount}">4</div>
+            <div class="stat-label">Shifts logged</div>
+        </div>
+        <div class="stat coral">
+            <div class="stat-icon"><svg class="icon"><use href="#i-calendar"></use></svg></div>
+            <div class="stat-value" style="font-size:1.4rem" th:text="${summary.hasHours()} ? ${fmt.date(summary.firstDay)} : '-'">Oct 2</div>
+            <div class="stat-label">Volunteering since</div>
+        </div>
+    </div>
+
+    <div class="dash-grid" style="margin-top:0">
+        <div class="card">
+            <div class="card-header"><h3>Logged shifts</h3></div>
+            <div class="table-wrap" th:unless="${#lists.isEmpty(shifts)}">
+                <table class="table">
+                    <thead><tr><th>Date</th><th>What you did</th><th class="num">Hours</th></tr></thead>
+                    <tbody>
+                    <tr th:each="shift : ${shifts}">
+                        <td class="strong" th:text="${fmt.date(shift.workDate)}">Oct 2</td>
+                        <td>
+                            <div th:text="${shift.note} ?: 'Volunteer work'">Note</div>
+                            <div class="tiny muted" th:if="${shift.eventTitle != null}" th:text="'At ' + ${shift.eventTitle}">At event</div>
+                        </td>
+                        <td class="num strong" th:text="${fmt.number(shift.hours)}">4</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <th:block th:if="${#lists.isEmpty(shifts)}">
+                <div th:replace="~{fragments/ui :: empty('clock', 'No hours yet', 'Log your first shift with the form on the right.')}"></div>
+            </th:block>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h3>Log a shift</h3></div>
+            <form method="post" action="/panel/hours" class="card-body form">
+                <input th:replace="~{fragments/ui :: csrf}">
+                <div class="form-row">
+                    <div class="field">
+                        <label class="label" for="workDate">Date</label>
+                        <input class="input" id="workDate" name="workDate" type="date" required
+                               th:max="${today}" th:value="${old['workDate']} ?: ${today}">
+                    </div>
+                    <div class="field">
+                        <label class="label" for="hours">Hours</label>
+                        <input class="input" id="hours" name="hours" type="number" min="0.25" max="16" step="0.25" required
+                               th:value="${old['hours']}" placeholder="e.g. 3.5">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label" for="eventId">At an event? <span class="optional">(optional)</span></label>
+                    <select class="select" id="eventId" name="eventId">
+                        <option value="">No, general volunteering</option>
+                        <option th:each="event : ${events}" th:value="${event.id}" th:text="${event.title} + ' (' + ${fmt.date(event.startsAt)} + ')'"
+                                th:selected="${old['eventId'] == '' + event.id}">Event</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label class="label" for="note">What did you do? <span class="optional">(optional)</span></label>
+                    <input class="input" id="note" name="note" maxlength="255" th:value="${old['note']}" placeholder="e.g. Packed food parcels">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><svg class="icon"><use href="#i-plus"></use></svg>Log hours</button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

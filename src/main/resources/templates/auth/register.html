@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/auth :: layout('Create your account', ~{::article})}">
+<body>
+<article class="auth-card rise" th:with="chosenRole=${old['role']} ?: (${selectedRole} ?: 'DONOR')">
+    <span class="eyebrow">Join the movement</span>
+    <h1 style="margin-top:.8rem">Create your account</h1>
+    <p class="lead">It takes less than a minute, and you can change everything later.</p>
+
+    <form method="post" action="/register" class="form">
+        <input th:replace="~{fragments/ui :: csrf}">
+
+        <div class="field">
+            <span class="label">I want to join as</span>
+            <div class="choices choices-2">
+                <label class="choice" th:each="role : ${roles}">
+                    <input type="radio" name="role" th:value="${role.name()}" th:checked="${role.name() == chosenRole}" required>
+                    <span class="choice-body">
+                        <span class="choice-icon"><svg class="icon"><use th:href="${role.name() == 'VOLUNTEER'} ? '#i-hand' : '#i-heart'"></use></svg></span>
+                        <span>
+                            <span class="choice-title" th:text="${role.label}">Donor</span>
+                            <span class="choice-text" th:text="${role.name() == 'VOLUNTEER'} ? 'Give your time and skills' : 'Give money or goods'">Give</span>
+                        </span>
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label" for="fullName">Full name</label>
+            <input class="input" id="fullName" name="fullName" autocomplete="name" required maxlength="120" th:value="${old['fullName']}" placeholder="Salma Hassan">
+        </div>
+        <div class="form-row">
+            <div class="field">
+                <label class="label" for="email">Email</label>
+                <input class="input" id="email" name="email" type="email" autocomplete="email" required th:value="${old['email']}" placeholder="you@example.com">
+            </div>
+            <div class="field">
+                <label class="label" for="phone">Phone <span class="optional">(optional)</span></label>
+                <input class="input" id="phone" name="phone" type="tel" autocomplete="tel" maxlength="30" th:value="${old['phone']}" placeholder="+20 100 000 0000">
+            </div>
+        </div>
+        <div class="field">
+            <label class="label" for="password">Password</label>
+            <input class="input" id="password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block">Create my account<svg class="icon"><use href="#i-arrow"></use></svg></button>
+    </form>
+
+    <p class="auth-switch">Already with us? <a href="/login">Sign in</a></p>
+</article>
+</body>
+</html>

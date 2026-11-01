@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer th:fragment="footer" class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="stack">
+                <a th:replace="~{fragments/nav :: brand}"></a>
+                <p>Bridging generosity and real need since 2012. Every gift, every hour and every handshake moves a family forward.</p>
+            </div>
+            <div>
+                <h4>Give</h4>
+                <a href="/donate">Make a donation</a>
+                <a href="/#campaigns">Active campaigns</a>
+                <a href="/register?role=DONOR">Become a donor</a>
+            </div>
+            <div>
+                <h4>Get involved</h4>
+                <a href="/events">Upcoming events</a>
+                <a href="/register?role=VOLUNTEER">Volunteer with us</a>
+                <a href="/#how-it-works">How it works</a>
+            </div>
+            <div>
+                <h4>Reach us</h4>
+                <a href="mailto:hello@hopebridge.org">hello@hopebridge.org</a>
+                <a href="tel:+201005550100">+20 100 555 0100</a>
+                <span>12 Tahrir St, Cairo</span>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 HopeBridge. A registered non-profit organization.</span>
+            <span>Made with care for the people we serve.</span>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

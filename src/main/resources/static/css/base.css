@@ -1,0 +1,165 @@
+/* =================================================================
+   HopeBridge design system - 1. foundations
+   Colors, type, spacing and the small resets everything else builds on.
+   ================================================================= */
+
+:root {
+    /* Brand: deep emerald for trust, warm coral for the call to give */
+    --emerald-950: #032a24;
+    --emerald-900: #063b33;
+    --emerald-800: #0a4d43;
+    --emerald-700: #0e6656;
+    --emerald-600: #12826d;
+    --emerald-500: #19a386;
+    --emerald-400: #3cc4a4;
+    --emerald-200: #a8ebd8;
+    --emerald-100: #d6f5ec;
+    --emerald-50:  #edfbf6;
+
+    --coral-600: #ec4e3a;
+    --coral-500: #ff6a55;
+    --coral-400: #ff8a78;
+    --coral-100: #ffe3dd;
+    --coral-50:  #fff3f0;
+
+    --amber-500: #f2a516;
+    --amber-100: #fdf0d2;
+    --sky-500:   #3b82f6;
+    --sky-100:   #dbeafe;
+    --violet-500:#7c6cf0;
+
+    /* Warm neutrals instead of cold greys */
+    --sand-25:  #fefcf9;
+    --sand-50:  #fbf8f3;
+    --sand-100: #f5efe5;
+    --sand-200: #ebe3d6;
+    --ink:      #10221e;
+    --ink-soft: #33463f;
+    --muted:    #6a7b75;
+    --line:     #e8e1d5;
+    --white:    #ffffff;
+
+    /* Semantic tokens */
+    --bg: var(--sand-50);
+    --surface: var(--white);
+    --surface-soft: var(--sand-25);
+    --primary: var(--emerald-700);
+    --primary-strong: var(--emerald-800);
+    --accent: var(--coral-500);
+    --success: #149a6b;
+    --warning: #c98208;
+    --danger: #d9442f;
+
+    /* Type */
+    --font-sans: "Plus Jakarta Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+
+    /* Shape & depth */
+    --radius-xs: 8px;
+    --radius-sm: 12px;
+    --radius: 18px;
+    --radius-lg: 28px;
+    --radius-pill: 999px;
+    --shadow-xs: 0 1px 2px rgba(16, 34, 30, .06);
+    --shadow-sm: 0 2px 6px rgba(16, 34, 30, .05), 0 1px 2px rgba(16, 34, 30, .06);
+    --shadow: 0 12px 32px -12px rgba(16, 34, 30, .18), 0 2px 6px rgba(16, 34, 30, .05);
+    --shadow-lg: 0 30px 60px -20px rgba(6, 59, 51, .35), 0 8px 20px -8px rgba(6, 59, 51, .15);
+    --ring: 0 0 0 4px rgba(25, 163, 134, .18);
+
+    --ease: cubic-bezier(.22, .8, .24, 1);
+    --container: 1180px;
+}
+
+/* ---------------------------------------------------------------- reset */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+table { border-collapse: collapse; width: 100%; }
+::selection { background: var(--emerald-200); color: var(--emerald-950); }
+
+:focus-visible { outline: none; box-shadow: var(--ring); border-radius: var(--radius-xs); }
+
+/* ----------------------------------------------------------- typography */
+h1, h2, h3, h4 { margin: 0; line-height: 1.15; letter-spacing: -.02em; color: var(--ink); }
+h1, h2, .display { font-family: var(--font-display); font-weight: 600; }
+h1 { font-size: clamp(2.2rem, 4.5vw, 3.6rem); }
+h2 { font-size: clamp(1.7rem, 3vw, 2.4rem); }
+h3 { font-size: 1.2rem; font-weight: 700; }
+h4 { font-size: 1rem; font-weight: 700; }
+p { margin: 0; }
+
+.eyebrow {
+    display: inline-flex; align-items: center; gap: .5rem;
+    font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--emerald-600);
+}
+.eyebrow::before { content: ""; width: 22px; height: 2px; border-radius: 2px; background: currentColor; }
+
+.lead { font-size: 1.1rem; color: var(--ink-soft); max-width: 60ch; }
+.muted { color: var(--muted); }
+.small { font-size: .85rem; }
+.tiny { font-size: .75rem; }
+.strong { font-weight: 700; }
+.mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; letter-spacing: .02em; }
+.text-accent { color: var(--accent); }
+.text-primary { color: var(--primary); }
+.highlight {
+    background: linear-gradient(transparent 62%, rgba(255, 106, 85, .28) 62%);
+    padding: 0 .1em;
+}
+
+/* --------------------------------------------------------------- icons */
+.icon {
+    width: 1.15em; height: 1.15em; flex: none;
+    stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.icon-lg { width: 1.5rem; height: 1.5rem; }
+
+/* ----------------------------------------------------------- utilities */
+.container { width: min(100% - 2.5rem, var(--container)); margin-inline: auto; }
+.stack > * + * { margin-top: var(--stack, 1rem); }
+.row { display: flex; align-items: center; gap: .75rem; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.wrap { flex-wrap: wrap; }
+.grow { flex: 1; }
+.center { text-align: center; }
+.hidden, [hidden] { display: none !important; }
+.sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;
+}
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+@keyframes fill { from { width: 0; } }
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-10px); }
+}
+
+.rise { animation: rise .7s var(--ease) both; }
+.rise-1 { animation-delay: .08s; }
+.rise-2 { animation-delay: .16s; }
+.rise-3 { animation-delay: .24s; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

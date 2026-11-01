@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('My tickets', ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <h1>My tickets</h1>
+            <p>Show your ticket code at the door. We'll remind you before each event.</p>
+        </div>
+        <a href="/events" class="btn btn-primary"><svg class="icon"><use href="#i-calendar"></use></svg>Find more events</a>
+    </div>
+
+    <div class="card">
+        <div class="event-row" th:each="registration : ${registrations}" th:with="event=${registration.event}">
+            <div th:replace="~{fragments/ui :: date-tile(${event.startsAt})}"></div>
+            <div class="event-info">
+                <div class="row wrap" style="gap:.4rem">
+                    <span class="badge badge-emerald plain" th:text="${event.categoryName}">Workshop</span>
+                    <span class="badge badge-neutral plain" th:if="${event.past}">Past event</span>
+                </div>
+                <h3 style="margin-top:.45rem" th:text="${event.title}">Event</h3>
+                <div class="event-meta">
+                    <span><svg class="icon"><use href="#i-clock"></use></svg><span th:text="${fmt.dateTime(event.startsAt)}">Sat</span></span>
+                    <span><svg class="icon"><use href="#i-pin"></use></svg><span th:text="${event.location}">Place</span></span>
+                </div>
+            </div>
+            <div class="row" style="gap:.6rem">
+                <div class="chip mono" style="font-size:.95rem;padding:.55rem 1rem">
+                    <svg class="icon"><use href="#i-ticket"></use></svg><span th:text="${registration.ticketCode}">EVT-XXXX</span>
+                </div>
+                <form method="post" action="/events/unregister" th:unless="${event.past}"
+                      th:attr="data-confirm='Cancel your registration for ' + ${event.title} + '? Your seat will be released.'">
+                    <input th:replace="~{fragments/ui :: csrf}">
+                    <input type="hidden" name="eventId" th:value="${event.id}">
+                    <button type="submit" class="btn btn-sm btn-danger"><svg class="icon"><use href="#i-x"></use></svg>Cancel</button>
+                </form>
+            </div>
+        </div>
+        <th:block th:if="${#lists.isEmpty(registrations)}">
+            <div th:replace="~{fragments/ui :: empty('ticket', 'No tickets yet', 'Register for an event and your ticket will appear here.')}"></div>
+        </th:block>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('Staff members', ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <h1>Staff members</h1>
+            <p>Public sign-up only creates donors and volunteers. New team members are added here by an existing staff member.</p>
+        </div>
+    </div>
+
+    <div class="dash-grid" style="margin-top:0">
+        <!-- ===================================================== the team -->
+        <div class="card">
+            <div class="card-header">
+                <h3>The team</h3>
+                <span class="badge plain" th:text="${#lists.size(staff)} + ' members'">3 members</span>
+            </div>
+            <ul class="list">
+                <li class="list-item" th:each="member : ${staff}">
+                    <span class="avatar" th:text="${fmt.initials(member.fullName)}">MA</span>
+                    <div class="grow" style="min-width:0">
+                        <div class="strong small" th:text="${member.fullName}">Mariam Adel</div>
+                        <div class="tiny muted" th:text="${member.email} + ' · since ' + ${fmt.date(member.createdAt)}">staff@hopebridge.org</div>
+                    </div>
+                    <span class="badge badge-emerald plain" th:if="${member.id == currentUser.id}">You</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ================================================= add a member -->
+        <div class="card">
+            <div class="card-header"><h3>Add a staff member</h3></div>
+            <form method="post" action="/panel/staff" class="card-body form">
+                <input th:replace="~{fragments/ui :: csrf}">
+                <div class="field">
+                    <label class="label" for="fullName">Full name</label>
+                    <input class="input" id="fullName" name="fullName" required maxlength="120"
+                           th:value="${old['fullName']}" placeholder="e.g. Karim Mostafa">
+                </div>
+                <div class="field">
+                    <label class="label" for="email">Email</label>
+                    <input class="input" id="email" name="email" type="email" required
+                           th:value="${old['email']}" placeholder="name@hopebridge.org">
+                </div>
+                <div class="field">
+                    <label class="label" for="phone">Phone <span class="optional">(optional)</span></label>
+                    <input class="input" id="phone" name="phone" type="tel" maxlength="30"
+                           th:value="${old['phone']}" placeholder="+20 100 000 0000">
+                </div>
+                <div class="field">
+                    <label class="label" for="password">Temporary password</label>
+                    <input class="input" id="password" name="password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+                    <span class="hint">Share it with them privately. They will get a welcome message in their inbox.</span>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><svg class="icon"><use href="#i-plus"></use></svg>Add to the team</button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

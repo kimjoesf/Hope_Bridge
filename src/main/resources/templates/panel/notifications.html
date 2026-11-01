@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('Inbox', ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <h1>Inbox</h1>
+            <p>Every message we've sent you, shaped for the channel it travelled on.
+                You're currently reached by <strong th:text="${currentUser.communicationStrategy.label}">Email</strong> -
+                <a href="/panel/profile" class="text-primary strong">change</a>.</p>
+        </div>
+        <form method="post" action="/panel/notifications/read" th:if="${unreadCount > 0}">
+            <input th:replace="~{fragments/ui :: csrf}">
+            <button type="submit" class="btn"><svg class="icon"><use href="#i-check"></use></svg>Mark all as read</button>
+        </form>
+    </div>
+
+    <div class="card card-body">
+        <div class="inbox">
+            <div class="msg" th:each="message : ${notifications}">
+                <span class="msg-channel" th:classappend="${#strings.toLowerCase(message.channel)}">
+                    <svg class="icon"><use th:href="|#i-${fmt.icon(message.channel)}|"></use></svg>
+                </span>
+                <div class="msg-content">
+                    <div class="msg-meta">
+                        <span class="new" th:unless="${message.read}" title="Unread"></span>
+                        <strong th:text="${fmt.humanize(message.channel)}">Email</strong>
+                        <span th:text="${fmt.timeAgo(message.createdAt)}">2 days ago</span>
+                    </div>
+
+                    <th:block th:switch="${message.channel}">
+                        <!-- An email looks like a letter -->
+                        <div class="msg-email" th:case="'EMAIL'">
+                            <header>From HopeBridge &lt;hello@hopebridge.org&gt;<strong th:text="${message.subject}">Subject</strong></header>
+                            <div class="body" th:text="${message.body}">Body</div>
+                        </div>
+                        <!-- An SMS looks like a chat bubble -->
+                        <div class="msg-sms" th:case="'SMS'" th:text="${message.body}">Text</div>
+                        <!-- A social message looks like a post -->
+                        <div class="msg-social" th:case="*">
+                            <div class="who"><span class="avatar">HB</span><strong>HopeBridge</strong><span>@hopebridge</span></div>
+                            <p th:text="${message.body}">Post</p>
+                        </div>
+                    </th:block>
+                </div>
+            </div>
+        </div>
+        <th:block th:if="${#lists.isEmpty(notifications)}">
+            <div th:replace="~{fragments/ui :: empty('inbox', 'Your inbox is empty', 'Thank-yous, receipts and event reminders will land here.')}"></div>
+        </th:block>
+    </div>
+</section>
+</body>
+</html>

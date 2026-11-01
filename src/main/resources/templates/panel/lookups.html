@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('Lookup tables', ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <h1>Lookup tables</h1>
+            <p>The lists that power every form in HopeBridge. One screen manages all of them.</p>
+        </div>
+        <a th:href="@{/panel/lookups/edit(table=${table.slug})}" class="btn btn-primary">
+            <svg class="icon"><use href="#i-plus"></use></svg><span th:text="'New ' + ${#strings.toLowerCase(table.itemLabel)}">New skill</span></a>
+    </div>
+
+    <nav class="tabs" style="margin-bottom:1.25rem" aria-label="Lookup tables">
+        <a class="tab" th:each="each : ${tables}" th:href="@{/panel/lookups(table=${each.slug})}" th:classappend="${each == table} ? 'active'">
+            <svg class="icon"><use th:href="|#i-${fmt.icon(each.slug)}|"></use></svg>
+            <span th:text="${each.title}">Skills</span>
+            <span class="count" th:text="${counts[each]}">8</span>
+        </a>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <h3 th:text="${table.title}">Skills</h3>
+                <p class="small muted" th:text="${table.purpose}">Purpose</p>
+            </div>
+        </div>
+        <div class="table-wrap" th:unless="${#lists.isEmpty(items)}">
+            <table class="table">
+                <thead><tr><th>Name</th><th>Description</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="item : ${items}">
+                    <td class="strong" th:text="${item.name}">First aid</td>
+                    <td class="muted small" th:text="${item.description} ?: '-'">Description</td>
+                    <td>
+                        <span class="badge badge-success" th:if="${item.active}">Active</span>
+                        <span class="badge badge-neutral" th:unless="${item.active}">Inactive</span>
+                    </td>
+                    <td class="actions">
+                        <a th:href="@{/panel/lookups/edit(table=${table.slug},id=${item.id})}" class="btn btn-sm"><svg class="icon"><use href="#i-edit"></use></svg>Edit</a>
+                        <form method="post" action="/panel/lookups/delete" th:attr="data-confirm='Delete ' + ${item.name} + '? This cannot be undone.'">
+                            <input th:replace="~{fragments/ui :: csrf}">
+                            <input type="hidden" name="table" th:value="${table.slug}">
+                            <input type="hidden" name="id" th:value="${item.id}">
+                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Delete"><svg class="icon"><use href="#i-trash"></use></svg></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <th:block th:if="${#lists.isEmpty(items)}">
+            <div th:replace="~{fragments/ui :: empty('database', 'This table is empty', 'Add the first entry with the button above.')}"></div>
+        </th:block>
+    </div>
+</section>
+</body>
+</html>

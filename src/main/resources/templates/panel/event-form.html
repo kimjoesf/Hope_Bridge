@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout((${event == null} ? 'New event' : 'Edit event'), ~{::section})}">
+<body>
+<section class="page" th:with="isNew=${event == null}">
+    <div class="page-head">
+        <div>
+            <a href="/panel/manage/events" class="btn btn-ghost btn-sm" style="margin-bottom:.6rem"><svg class="icon"><use href="#i-back"></use></svg>All events</a>
+            <h1 th:text="${isNew} ? 'Publish a new event' : 'Edit ' + ${event.title}">New event</h1>
+            <p th:text="${isNew} ? 'Once published, every volunteer gets an invitation to help.' : 'Saving will let everyone registered know about the change.'">Info</p>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:820px">
+        <form method="post" action="/panel/manage/events/save" class="card-body form">
+            <input th:replace="~{fragments/ui :: csrf}">
+            <input type="hidden" name="id" th:value="${isNew} ? '' : ${event.id}">
+
+            <div class="field">
+                <label class="label" for="title">Title</label>
+                <input class="input" id="title" name="title" required maxlength="140"
+                       th:value="${old['title']} ?: (${isNew} ? '' : ${event.title})" placeholder="e.g. Neighborhood Food Drive">
+            </div>
+            <div class="field">
+                <label class="label" for="summary">Summary</label>
+                <textarea class="textarea" id="summary" name="summary" required maxlength="600"
+                          th:text="${old['summary']} ?: (${isNew} ? '' : ${event.summary})" placeholder="What will happen, and why it matters"></textarea>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label class="label" for="categoryId">Category</label>
+                    <select class="select" id="categoryId" name="categoryId" required
+                            th:with="chosen=${old['categoryId']} ?: (${isNew} ? '' : ${'' + event.categoryId})">
+                        <option value="">Choose a category...</option>
+                        <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
+                                th:selected="${chosen == '' + category.id}">Workshop</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label class="label" for="location">Location</label>
+                    <input class="input" id="location" name="location" required maxlength="160"
+                           th:value="${old['location']} ?: (${isNew} ? '' : ${event.location})" placeholder="Venue and area">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label class="label" for="startsAt">Starts at</label>
+                    <input class="input" id="startsAt" name="startsAt" type="datetime-local" required
+                           th:value="${old['startsAt']} ?: (${isNew} ? '' : ${fmt.inputDateTime(event.startsAt)})">
+                </div>
+                <div class="field">
+                    <label class="label" for="capacity">Capacity</label>
+                    <input class="input" id="capacity" name="capacity" type="number" min="1" required
+                           th:value="${old['capacity']} ?: (${isNew} ? '' : ${event.capacity})" placeholder="e.g. 50">
+                    <span class="hint" th:unless="${isNew}" th:text="${event.registeredCount} + ' people are already registered.'">5 registered</span>
+                </div>
+            </div>
+            <div class="row" style="justify-content:flex-end">
+                <a href="/panel/manage/events" class="btn btn-ghost">Cancel</a>
+                <button type="submit" class="btn btn-primary"><svg class="icon"><use href="#i-send"></use></svg><span th:text="${isNew} ? 'Publish event' : 'Save and notify attendees'">Publish</span></button>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- The brand mark, reused by every shell -->
+<a th:fragment="brand" href="/" class="brand" aria-label="HopeBridge home">
+    <span class="brand-mark"><svg class="icon"><use href="#i-logo"></use></svg></span>
+    <span>HopeBridge<small>Non-profit</small></span>
+</a>
+
+<!-- Top navigation of the public site -->
+<header th:fragment="public-nav" class="site-header" id="site-header">
+    <div class="container">
+        <a th:replace="~{fragments/nav :: brand}"></a>
+        <button class="menu-toggle" type="button" data-toggle-open="#site-header" aria-label="Open menu">
+            <svg class="icon icon-lg"><use href="#i-menu"></use></svg>
+        </button>
+        <nav class="site-nav" aria-label="Main">
+            <a href="/" th:classappend="${path == ''} ? 'active'">Home</a>
+            <a href="/#campaigns">Campaigns</a>
+            <a href="/events" th:classappend="${path == '/events'} ? 'active'">Events</a>
+            <a href="/#how-it-works">How it works</a>
+        </nav>
+        <div class="site-actions">
+            <th:block th:if="${currentUser == null}">
+                <a href="/login" class="btn btn-ghost">Sign in</a>
+                <a href="/donate" class="btn btn-accent"><svg class="icon"><use href="#i-heart"></use></svg>Donate</a>
+            </th:block>
+            <th:block th:if="${currentUser != null}">
+                <a href="/donate" class="btn btn-accent"><svg class="icon"><use href="#i-heart"></use></svg>Donate</a>
+                <a href="/panel" class="btn"><svg class="icon"><use href="#i-grid"></use></svg>My panel</a>
+            </th:block>
+        </div>
+    </div>
+</header>
+
+<!-- Left-hand navigation of the control panel; the links shown depend on the role -->
+<aside th:fragment="sidebar" class="sidebar" aria-label="Control panel">
+    <a th:replace="~{fragments/nav :: brand}"></a>
+
+    <nav class="side-group">
+        <span class="side-label">Overview</span>
+        <a href="/panel" class="side-link" th:classappend="${path == '/panel'} ? 'active'">
+            <svg class="icon"><use href="#i-grid"></use></svg>Dashboard</a>
+        <a href="/panel/notifications" class="side-link" th:classappend="${path == '/panel/notifications'} ? 'active'">
+            <svg class="icon"><use href="#i-inbox"></use></svg>Inbox
+            <span class="count" th:if="${unreadCount > 0}" th:text="${unreadCount}">2</span></a>
+    </nav>
+
+    <nav class="side-group">
+        <span class="side-label">Giving</span>
+        <a href="/donate" class="side-link" th:classappend="${path == '/donate'} ? 'active'">
+            <svg class="icon"><use href="#i-heart"></use></svg>Make a donation</a>
+        <a href="/panel/donations" class="side-link" th:classappend="${#strings.startsWith(path, '/panel/donations')} ? 'active'">
+            <svg class="icon"><use href="#i-receipt"></use></svg>My donations</a>
+    </nav>
+
+    <nav class="side-group" th:if="${currentUser.volunteer}">
+        <span class="side-label">Volunteering</span>
+        <a href="/panel/volunteer" class="side-link" th:classappend="${path == '/panel/volunteer'} ? 'active'">
+            <svg class="icon"><use href="#i-sparkles"></use></svg>Skills &amp; availability</a>
+        <a href="/panel/hours" class="side-link" th:classappend="${path == '/panel/hours'} ? 'active'">
+            <svg class="icon"><use href="#i-clock"></use></svg>My hours</a>
+        <a href="/panel/certificate" class="side-link">
+            <svg class="icon"><use href="#i-award"></use></svg>Certificate</a>
+    </nav>
+
+    <nav class="side-group">
+        <span class="side-label">Events</span>
+        <a href="/events" class="side-link">
+            <svg class="icon"><use href="#i-calendar"></use></svg>Browse events</a>
+        <a href="/panel/events" class="side-link" th:classappend="${path == '/panel/events'} ? 'active'">
+            <svg class="icon"><use href="#i-ticket"></use></svg>My tickets</a>
+    </nav>
+
+    <nav class="side-group" th:if="${currentUser.staff}">
+        <span class="side-label">Operations</span>
+        <a href="/panel/manage/events" class="side-link" th:classappend="${#strings.startsWith(path, '/panel/manage/events')} ? 'active'">
+            <svg class="icon"><use href="#i-sliders"></use></svg>Manage events</a>
+        <a href="/panel/lookups" class="side-link" th:classappend="${#strings.startsWith(path, '/panel/lookups')} ? 'active'">
+            <svg class="icon"><use href="#i-database"></use></svg>Lookup tables</a>
+        <a href="/panel/staff" class="side-link" th:classappend="${path == '/panel/staff'} ? 'active'">
+            <svg class="icon"><use href="#i-users"></use></svg>Staff members</a>
+    </nav>
+
+    <nav class="side-group">
+        <span class="side-label">Account</span>
+        <a href="/panel/profile" class="side-link" th:classappend="${path == '/panel/profile'} ? 'active'">
+            <svg class="icon"><use href="#i-user"></use></svg>Profile &amp; preferences</a>
+    </nav>
+
+    <div class="side-user">
+        <span class="avatar" th:text="${fmt.initials(currentUser.fullName)}">OK</span>
+        <div class="who">
+            <strong th:text="${currentUser.fullName}">Omar Khaled</strong>
+            <span th:text="${currentUser.role.label}">Donor</span>
+        </div>
+        <form method="post" action="/logout">
+            <input th:replace="~{fragments/ui :: csrf}">
+            <button type="submit" title="Sign out" aria-label="Sign out"><svg class="icon"><use href="#i-logout"></use></svg></button>
+        </form>
+    </div>
+</aside>
+
+<!-- The sticky bar on top of every panel page -->
+<header th:fragment="topbar(title)" class="topbar">
+    <button class="panel-toggle" type="button" data-toggle-open="#panel" aria-label="Open navigation">
+        <svg class="icon icon-lg"><use href="#i-menu"></use></svg>
+    </button>
+    <div class="crumbs">Control panel <span class="dot-sep"></span><strong th:text="${title}">Dashboard</strong></div>
+    <div class="topbar-actions">
+        <a href="/" class="btn btn-ghost btn-sm"><svg class="icon"><use href="#i-home"></use></svg>View site</a>
+        <a href="/panel/notifications" class="bell" aria-label="Inbox">
+            <svg class="icon"><use href="#i-bell"></use></svg>
+            <span class="dot" th:if="${unreadCount > 0}" th:text="${unreadCount}">2</span>
+        </a>
+        <a href="/donate" class="btn btn-accent btn-sm"><svg class="icon"><use href="#i-heart"></use></svg>Donate</a>
+    </div>
+</header>
+
+</body>
+</html>

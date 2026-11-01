@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout('Dashboard', ~{::section})}">
+<body>
+<section class="page">
+
+    <!-- ========================================================= welcome -->
+    <div class="welcome rise">
+        <div>
+            <span class="badge plain" style="background:rgba(255,255,255,.15);color:#fff" th:text="${currentUser.role.label} + ' account'">Donor account</span>
+            <h1 style="margin-top:.7rem" th:text="'Hello, ' + ${currentUser.firstName} + '!'">Hello, Omar!</h1>
+            <p th:if="${currentUser.staff}">Here's how HopeBridge is doing today.</p>
+            <p th:unless="${currentUser.staff}">Thank you for being part of HopeBridge. Here's your impact at a glance.</p>
+        </div>
+        <div class="actions">
+            <a th:if="${currentUser.staff}" href="/panel/manage/events/edit" class="btn btn-light"><svg class="icon"><use href="#i-plus"></use></svg>New event</a>
+            <a th:if="${currentUser.volunteer}" href="/panel/hours" class="btn btn-light"><svg class="icon"><use href="#i-clock"></use></svg>Log hours</a>
+            <a href="/donate" class="btn btn-accent"><svg class="icon"><use href="#i-heart"></use></svg>Donate</a>
+        </div>
+    </div>
+
+    <!-- ============================================== staff: org numbers -->
+    <div class="grid grid-4" th:if="${currentUser.staff}">
+        <div class="stat">
+            <div class="stat-icon"><svg class="icon"><use href="#i-trend"></use></svg></div>
+            <div class="stat-value" th:text="${fmt.compactMoney(impact.totalRaised)}">$3.4K</div>
+            <div class="stat-label">Raised in total</div>
+        </div>
+        <div class="stat coral">
+            <div class="stat-icon"><svg class="icon"><use href="#i-users"></use></svg></div>
+            <div class="stat-value" th:text="${impact.donorCount}">6</div>
+            <div class="stat-label">Donors</div>
+        </div>
+        <div class="stat amber">
+            <div class="stat-icon"><svg class="icon"><use href="#i-alert"></use></svg></div>
+            <div class="stat-value" th:text="${impact.openDonations}">2</div>
+            <div class="stat-label">Gifts awaiting follow-up</div>
+        </div>
+        <div class="stat sky">
+            <div class="stat-icon"><svg class="icon"><use href="#i-calendar"></use></svg></div>
+            <div class="stat-value" th:text="${impact.upcomingEvents}">5</div>
+            <div class="stat-label">Upcoming events</div>
+        </div>
+    </div>
+
+    <!-- ===================================== donors & volunteers: my impact -->
+    <div class="grid grid-3" th:unless="${currentUser.staff}">
+        <div class="card card-body tier-card">
+            <div class="row-between">
+                <span class="label">Your tier</span>
+                <span th:replace="~{fragments/ui :: tier(${donorSummary.tier})}"></span>
+            </div>
+            <div class="stat-value" style="margin-top:1rem" th:text="${fmt.money(donorSummary.lifetimeGiving)}">$1,466</div>
+            <div class="stat-label">Lifetime giving</div>
+            <div class="tier-progress" th:if="${donorSummary.nextTier != null}">
+                <div class="small">
+                    <span th:text="${fmt.money(donorSummary.amountToNextTier)} + ' to ' + ${donorSummary.nextTier.label}">$533 to Gold</span>
+                    <span th:text="${donorSummary.progressToNextTier} + '%'">62%</span>
+                </div>
+                <div th:replace="~{fragments/ui :: progress(${donorSummary.progressToNextTier}, '')}"></div>
+            </div>
+            <p class="small muted" style="margin-top:1rem" th:if="${donorSummary.nextTier == null}">You're at our highest tier. Thank you!</p>
+        </div>
+
+        <div class="stat coral" th:unless="${currentUser.volunteer}">
+            <div class="stat-icon"><svg class="icon"><use href="#i-gift"></use></svg></div>
+            <div class="stat-value" th:text="${donorSummary.donationCount}">4</div>
+            <div class="stat-label">Gifts made</div>
+        </div>
+        <div class="stat amber" th:if="${currentUser.volunteer}">
+            <div class="stat-icon"><svg class="icon"><use href="#i-clock"></use></svg></div>
+            <div class="stat-value" th:text="${fmt.number(volunteerSummary.totalHours)}">15</div>
+            <div class="stat-label" th:text="'Volunteer hours across ' + ${volunteerSummary.shiftCount} + ' shifts'">hours</div>
+        </div>
+
+        <div class="stat sky">
+            <div class="stat-icon"><svg class="icon"><use href="#i-ticket"></use></svg></div>
+            <div class="stat-value" th:text="${#lists.size(registrations)}">2</div>
+            <div class="stat-label">Upcoming events you joined</div>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+        <!-- ============================================== donations table -->
+        <div class="card">
+            <div class="card-header">
+                <h3 th:text="${currentUser.staff} ? 'Latest donations' : 'Your recent gifts'">Recent gifts</h3>
+                <a href="/panel/donations" class="btn btn-ghost btn-sm" th:unless="${currentUser.staff}">View all<svg class="icon"><use href="#i-arrow"></use></svg></a>
+            </div>
+            <div class="table-wrap" th:unless="${#lists.isEmpty(recentDonations)}">
+                <table class="table">
+                    <thead><tr><th>Gift</th><th th:if="${currentUser.staff}">Donor</th><th>Status</th><th class="num">Amount</th><th></th></tr></thead>
+                    <tbody>
+                    <tr th:each="donation : ${recentDonations}">
+                        <td>
+                            <div class="row">
+                                <span class="list-icon"><svg class="icon"><use th:href="|#i-${fmt.icon(donation.method)}|"></use></svg></span>
+                                <div>
+                                    <div class="strong" th:text="${donation.campaignTitle} ?: ${donation.categoryName}">Campaign</div>
+                                    <div class="tiny muted" th:text="${fmt.date(donation.createdAt)}">Oct 2</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td th:if="${currentUser.staff}" th:text="${donation.donorName}">Omar</td>
+                        <td><span th:replace="~{fragments/ui :: status(${donation.status})}"></span></td>
+                        <td class="num strong" th:text="${fmt.money(donation.totalAmount)}">$250</td>
+                        <td class="actions"><a th:href="@{/panel/donations/receipt(id=${donation.id})}" class="btn btn-ghost btn-sm">Receipt</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <th:block th:if="${#lists.isEmpty(recentDonations)}">
+                <div th:replace="~{fragments/ui :: empty('heart', 'No gifts yet', 'Your first donation will appear here with its receipt.')}"></div>
+            </th:block>
+        </div>
+
+        <div class="grid" style="align-content:start">
+            <!-- ================================================== inbox peek -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Latest messages</h3>
+                    <a href="/panel/notifications" class="btn btn-ghost btn-sm">Inbox<svg class="icon"><use href="#i-arrow"></use></svg></a>
+                </div>
+                <ul class="list">
+                    <li class="list-item" th:each="message : ${latestNotifications}">
+                        <span class="list-icon"><svg class="icon"><use th:href="|#i-${fmt.icon(message.channel)}|"></use></svg></span>
+                        <div class="grow" style="min-width:0">
+                            <div class="strong small" th:text="${message.subject}">Subject</div>
+                            <div class="tiny muted" th:text="${fmt.humanize(message.channel)} + ' · ' + ${fmt.timeAgo(message.createdAt)}">Email · 2 days ago</div>
+                        </div>
+                        <span class="badge badge-coral plain" th:unless="${message.read}">New</span>
+                    </li>
+                </ul>
+                <th:block th:if="${#lists.isEmpty(latestNotifications)}">
+                    <div th:replace="~{fragments/ui :: empty('inbox', 'All quiet', 'Messages we send you will show up here.')}"></div>
+                </th:block>
+            </div>
+
+            <!-- ============================================== upcoming tickets -->
+            <div class="card" th:unless="${currentUser.staff}">
+                <div class="card-header"><h3>Your upcoming events</h3><a href="/events" class="btn btn-ghost btn-sm">Browse</a></div>
+                <div class="mini-ticket" th:each="registration : ${registrations}">
+                    <div th:replace="~{fragments/ui :: date-tile(${registration.event.startsAt})}"></div>
+                    <div class="grow">
+                        <div class="strong small" th:text="${registration.event.title}">Event</div>
+                        <div class="tiny muted mono" th:text="${registration.ticketCode}">EVT-XXXX</div>
+                    </div>
+                </div>
+                <th:block th:if="${#lists.isEmpty(registrations)}">
+                    <div th:replace="~{fragments/ui :: empty('ticket', 'No tickets yet', 'Find an event you would like to join.')}"></div>
+                </th:block>
+            </div>
+
+            <!-- ======================================== volunteer: my skills -->
+            <div class="card card-body" th:if="${currentUser.volunteer}">
+                <div class="row-between" style="margin-bottom:.9rem">
+                    <h3>Your skills</h3>
+                    <a href="/panel/volunteer" class="btn btn-ghost btn-sm">Edit</a>
+                </div>
+                <div class="row wrap" style="gap:.5rem">
+                    <span class="chip" th:each="skill : ${skills}"><svg class="icon"><use href="#i-sparkles"></use></svg><span th:text="${skill}">First aid</span></span>
+                    <span class="muted small" th:if="${#lists.isEmpty(skills)}">Tell us what you're good at so we can match you with the right work.</span>
+                </div>
+            </div>
+
+            <!-- ================================= staff: events & lookup tables -->
+            <div class="card" th:if="${currentUser.staff}">
+                <div class="card-header"><h3>Next events</h3><a href="/panel/manage/events" class="btn btn-ghost btn-sm">Manage</a></div>
+                <div class="mini-ticket" th:each="event : ${upcomingEvents}">
+                    <div th:replace="~{fragments/ui :: date-tile(${event.startsAt})}"></div>
+                    <div class="grow">
+                        <div class="strong small" th:text="${event.title}">Event</div>
+                        <div class="tiny muted" th:text="${event.registeredCount} + ' of ' + ${event.capacity} + ' registered'">5 of 30</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card" th:if="${currentUser.staff}">
+                <div class="card-header"><h3>Lookup tables</h3><a href="/panel/lookups" class="btn btn-ghost btn-sm">Open</a></div>
+                <ul class="list">
+                    <li class="list-item" th:each="entry : ${lookupCounts}">
+                        <span class="list-icon"><svg class="icon"><use th:href="|#i-${fmt.icon(entry.key.slug)}|"></use></svg></span>
+                        <a class="grow strong small" th:href="@{/panel/lookups(table=${entry.key.slug})}" th:text="${entry.key.title}">Skills</a>
+                        <span class="badge plain" th:text="${entry.value}">8</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/public :: layout('Make a donation', ~{::main})}">
+<body>
+<main class="site-main"
+      th:with="chosenCampaign=${old['campaignId']} ?: (${selectedCampaign != null} ? ${'' + selectedCampaign} : ''),
+               chosenMethod=${old['method']} ?: 'ONLINE'">
+
+    <section class="page-banner">
+        <div class="container">
+            <span class="eyebrow">Make a donation</span>
+            <h1>Every gift <span class="highlight">builds a bridge</span>.</h1>
+            <p class="lead">Choose a cause, pick how you'd like to give, and add a little extra if you wish. You'll get an official receipt straight away.</p>
+        </div>
+    </section>
+
+    <section class="container" style="padding-bottom:5rem">
+        <form id="donate-form" method="post" action="/donate" class="donate-grid"
+              th:attr="data-fee-rate=${feeRate},data-match-multiplier=${matchMultiplier}">
+            <input th:replace="~{fragments/ui :: csrf}">
+
+            <div class="card">
+                <!-- ---------------------------------------------- 1. cause -->
+                <div class="donate-step">
+                    <div class="step-title">
+                        <span class="step-number">1</span>
+                        <div><h3>Choose a cause</h3><p>Back a specific campaign, or let us put it where it's needed most.</p></div>
+                    </div>
+                    <div class="choices choices-2">
+                        <label class="choice">
+                            <input type="radio" name="campaignId" value="" data-title="Where it's needed most" th:checked="${chosenCampaign == ''}">
+                            <span class="choice-body">
+                                <span class="choice-icon"><svg class="icon"><use href="#i-sparkles"></use></svg></span>
+                                <span><span class="choice-title">Where it's needed most</span>
+                                      <span class="choice-text">Our team directs it to the most urgent need.</span></span>
+                                <span class="choice-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+                            </span>
+                        </label>
+                        <label class="choice" th:each="campaign : ${campaigns}">
+                            <input type="radio" name="campaignId" th:value="${campaign.id}" th:attr="data-title=${campaign.title}"
+                                   th:checked="${chosenCampaign == '' + campaign.id}">
+                            <span class="choice-body">
+                                <span class="choice-icon"><svg class="icon"><use href="#i-target"></use></svg></span>
+                                <span><span class="choice-title" th:text="${campaign.title}">Campaign</span>
+                                      <span class="choice-text" th:text="${campaign.progressPercent} + '% funded · ' + ${campaign.categoryName}">58% funded</span></span>
+                                <span class="choice-check"><svg class="icon"><use href="#i-check"></use></svg></span>
+                            </span>
+                        </label>
+                    </div>
+                    <div class="field method-fields" data-when-general>
+                        <label class="label" for="categoryId">Which area should it support?</label>
+                        <select class="select" id="categoryId" name="categoryId">
+                            <option value="">Choose a cause...</option>
+                            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"
+                                    th:selected="${old['categoryId'] == '' + category.id}">Food</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- --------------------------------------------- 2. method -->
+                <div class="donate-step">
+                    <div class="step-title">
+                        <span class="step-number">2</span>
+                        <div><h3>How would you like to give?</h3><p>Each method is handled its own way - pick what suits you.</p></div>
+                    </div>
+                    <div class="choices choices-3">
+                        <label class="choice" th:each="method : ${methods}">
+                            <input type="radio" name="method" th:value="${method.code}" th:attr="data-label=${method.label}"
+                                   th:checked="${method.code == chosenMethod}" required>
+                            <span class="choice-body">
+                                <span class="choice-icon"><svg class="icon"><use th:href="|#i-${fmt.icon(method.code)}|"></use></svg></span>
+                                <span><span class="choice-title" th:text="${method.label}">Online</span>
+                                      <span class="choice-text" th:text="${method.description}">Fast</span></span>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="method-fields" data-for="ONLINE CHECK">
+                        <div class="field">
+                            <label class="label" for="amount">Gift amount</label>
+                            <div class="input-group">
+                                <input class="input input-xl" id="amount" name="amount" type="number" min="1" step="0.01"
+                                       th:value="${old['amount']} ?: '50'" placeholder="0.00">
+                                <span class="prefix prefix-xl">$</span>
+                            </div>
+                            <div class="presets">
+                                <button type="button" class="preset" th:each="preset : ${presets}" th:attr="data-amount=${preset}" th:text="'$' + ${preset}">$50</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="method-fields" data-for="CHECK">
+                        <div class="form-row">
+                            <div class="field">
+                                <label class="label" for="checkNumber">Check number</label>
+                                <input class="input mono" id="checkNumber" name="checkNumber" inputmode="numeric" maxlength="12"
+                                       th:value="${old['checkNumber']}" placeholder="e.g. 10457">
+                            </div>
+                            <div class="callout" style="align-self:end">
+                                <svg class="icon"><use href="#i-mail"></use></svg>
+                                <span>Payable to <strong>HopeBridge</strong>, 12 Tahrir St, Cairo.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="method-fields" data-for="IN_KIND">
+                        <div class="form-row">
+                            <div class="field">
+                                <label class="label" for="itemDescription">What are you donating?</label>
+                                <input class="input" id="itemDescription" name="itemDescription" maxlength="255"
+                                       th:value="${old['itemDescription']}" placeholder="e.g. 20 winter blankets">
+                            </div>
+                            <div class="field">
+                                <label class="label" for="estimatedValue">Estimated value</label>
+                                <div class="input-group">
+                                    <input class="input" id="estimatedValue" name="estimatedValue" type="number" min="1" step="0.01"
+                                           th:value="${old['estimatedValue']}" placeholder="0.00">
+                                    <span class="prefix">$</span>
+                                </div>
+                                <span class="hint">Fair market value, used on your tax receipt.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- -------------------------------------------- 3. add-ons -->
+                <div class="donate-step" data-for="ONLINE CHECK">
+                    <div class="step-title">
+                        <span class="step-number">3</span>
+                        <div><h3>Make it go further <span class="muted small">(optional)</span></h3><p>Mix and match - each one wraps your gift with a little extra.</p></div>
+                    </div>
+                    <div class="grid" style="gap:.75rem">
+                        <div class="addon" th:each="addOn : ${addOns}">
+                            <label class="addon-head switch">
+                                <span class="grow">
+                                    <span class="strong" th:text="${addOn.label}">Cover fees</span>
+                                    <p th:text="${addOn.description}">Description</p>
+                                </span>
+                                <input type="checkbox" name="addOns" th:value="${addOn.code}"
+                                       th:checked="${old['addOns'] != null and #strings.contains(old['addOns'], addOn.code)}">
+                                <span class="track"></span>
+                            </label>
+                            <div class="addon-extra" th:if="${addOn.code == 'EMPLOYER_MATCH'}">
+                                <input class="input" name="employerName" maxlength="80" th:value="${old['employerName']}" placeholder="Your employer's name">
+                            </div>
+                            <div class="addon-extra" th:if="${addOn.code == 'DEDICATION'}">
+                                <input class="input" name="honoreeName" maxlength="80" th:value="${old['honoreeName']}" placeholder="In honour of...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ------------------------------------------------- summary -->
+            <aside class="card summary">
+                <div class="summary-head">
+                    <span class="label">Your total impact</span>
+                    <div class="summary-total" data-summary="total">$50.00</div>
+                </div>
+                <ul class="summary-lines">
+                    <li><span>Cause</span><strong data-summary="cause">Where it's needed most</strong></li>
+                    <li><span>Method</span><strong data-summary="method">Online</strong></li>
+                    <li><span>Your gift</span><span data-summary="gift">$50.00</span></li>
+                    <li data-line="fee" hidden><span>Fees covered</span><span data-summary="fee"></span></li>
+                    <li data-line="match" hidden><span>Employer match</span><span data-summary="match"></span></li>
+                    <li class="total"><span>Tax-deductible</span><span data-summary="deductible">$50.00</span></li>
+                </ul>
+                <div class="summary-desc">
+                    <strong>On your receipt</strong>
+                    <span data-summary="description">Monetary gift</span>
+                </div>
+                <div style="padding:0 1.5rem 1.5rem">
+                    <button type="submit" class="btn btn-accent btn-lg btn-block"><svg class="icon"><use href="#i-heart"></use></svg>Complete my donation</button>
+                    <p class="tiny muted center" style="margin-top:.75rem"><svg class="icon" style="display:inline;vertical-align:-3px"><use href="#i-shield"></use></svg> Your receipt is issued instantly and kept in your panel.</p>
+                </div>
+            </aside>
+        </form>
+    </section>
+</main>
+</body>
+</html>

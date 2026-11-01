@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/panel :: layout((${item.isNew()} ? 'New entry' : 'Edit entry'), ~{::section})}">
+<body>
+<section class="page">
+    <div class="page-head">
+        <div>
+            <a th:href="@{/panel/lookups(table=${table.slug})}" class="btn btn-ghost btn-sm" style="margin-bottom:.6rem">
+                <svg class="icon"><use href="#i-back"></use></svg><span th:text="${table.title}">Skills</span></a>
+            <h1 th:text="${item.isNew()} ? 'New ' + ${#strings.toLowerCase(table.itemLabel)} : 'Edit ' + ${item.name}">New skill</h1>
+            <p th:text="${table.purpose}">Purpose</p>
+        </div>
+    </div>
+
+    <div class="card" style="max-width:640px">
+        <form method="post" action="/panel/lookups/save" class="card-body form">
+            <input th:replace="~{fragments/ui :: csrf}">
+            <input type="hidden" name="table" th:value="${table.slug}">
+            <input type="hidden" name="id" th:value="${item.isNew()} ? '' : ${item.id}">
+
+            <div class="field">
+                <label class="label" for="name">Name</label>
+                <input class="input" id="name" name="name" required maxlength="80" autofocus
+                       th:value="${old['name']} ?: ${item.name}">
+            </div>
+            <div class="field">
+                <label class="label" for="description">Description <span class="optional">(optional)</span></label>
+                <textarea class="textarea" id="description" name="description" maxlength="255"
+                          th:text="${old['description']} ?: ${item.description}"></textarea>
+            </div>
+            <label class="switch">
+                <input type="checkbox" name="active" th:checked="${#maps.isEmpty(old) ? item.active : old['active'] != null}">
+                <span class="track"></span>
+                <span>Active <span class="muted small">- inactive entries stay in history but disappear from forms</span></span>
+            </label>
+            <div class="row" style="justify-content:flex-end">
+                <a th:href="@{/panel/lookups(table=${table.slug})}" class="btn btn-ghost">Cancel</a>
+                <button type="submit" class="btn btn-primary"><svg class="icon"><use href="#i-check"></use></svg>Save</button>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

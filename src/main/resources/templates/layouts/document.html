@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<!--
+    Shell for printable documents (receipts, certificates): just the paper and a small toolbar
+    that disappears when printing.
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, backUrl, backLabel, content)">
+<head th:replace="~{fragments/head :: head(${title})}"></head>
+<body class="document-body">
+<svg th:replace="~{fragments/icons :: sprite}"></svg>
+<div th:replace="~{fragments/ui :: flash}"></div>
+<div class="document-bar no-print">
+    <a th:href="${backUrl}" class="btn btn-ghost"><svg class="icon"><use href="#i-back"></use></svg><span th:text="${backLabel}">Back</span></a>
+    <button type="button" class="btn btn-primary" data-print><svg class="icon"><use href="#i-printer"></use></svg>Print or save as PDF</button>
+</div>
+<article th:replace="${content}"></article>
+</body>
+</html>
+ 

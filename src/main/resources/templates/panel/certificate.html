@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/document :: layout('Certificate of appreciation', '/panel/hours', 'My hours', ~{::article})}">
+<body>
+<article class="sheet certificate rise">
+    <div class="certificate-frame">
+        <span class="kicker">HopeBridge Foundation</span>
+        <h1>Certificate of Appreciation</h1>
+        <p class="presented">This certificate is proudly presented to</p>
+        <div class="recipient" th:text="${currentUser.fullName}">Salma Hassan</div>
+        <p class="citation">
+            in heartfelt recognition of the time, energy and kindness given as a HopeBridge volunteer
+            between <strong th:text="${fmt.date(summary.firstDay)}">Oct 2</strong>
+            and <strong th:text="${fmt.date(summary.lastDay)}">Oct 20</strong>.
+            Your service has made a real difference in the lives of the families we serve.
+        </p>
+        <div class="hours">
+            <div><strong th:text="${fmt.number(summary.totalHours)}">15</strong><span>Hours of service</span></div>
+            <div><strong th:text="${summary.shiftCount}">4</strong><span>Shifts</span></div>
+        </div>
+        <div class="certificate-foot">
+            <div class="signature">
+                <div class="sig">Mariam Adel</div>
+                <div class="rule"></div>
+                <div class="tiny muted">Director of Development</div>
+            </div>
+            <div class="seal"><svg class="icon"><use href="#i-award"></use></svg></div>
+            <div>
+                <div class="tiny muted">Certificate no.</div>
+                <div class="mono strong" th:text="${certificateNumber}">HB-VOL-00003</div>
+                <div class="tiny muted" style="margin-top:.4rem" th:text="'Issued ' + ${fmt.today()}">Issued</div>
+            </div>
+        </div>
+    </div>
+</article>
+</body>
+</html>

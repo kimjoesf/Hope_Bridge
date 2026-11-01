@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/public :: layout('Events', ~{::main})}">
+<body>
+<main class="site-main">
+    <section class="page-banner">
+        <div class="container">
+            <span class="eyebrow">Events</span>
+            <h1>Show up. <span class="highlight">Lend a hand.</span></h1>
+            <p class="lead">Fundraisers, workshops and outreach programs. Register in one click and we'll send you a reminder before the day.</p>
+        </div>
+    </section>
+
+    <section class="container" style="padding-bottom:5.5rem">
+        <div class="grid grid-3">
+            <article class="card card-hover event-card" th:each="event : ${events}"
+                     th:with="registered=${#lists.contains(registeredIds, event.id)}">
+                <div class="card-body">
+                    <div class="top">
+                        <div th:replace="~{fragments/ui :: date-tile(${event.startsAt})}"></div>
+                        <div>
+                            <span class="badge badge-emerald plain" th:text="${event.categoryName}">Workshop</span>
+                            <h3 style="margin-top:.45rem" th:text="${event.title}">Event</h3>
+                        </div>
+                    </div>
+                    <p th:text="${event.summary}">Summary</p>
+                    <div class="event-meta">
+                        <span><svg class="icon"><use href="#i-clock"></use></svg><span th:text="${fmt.dateTime(event.startsAt)}">Sat</span></span>
+                        <span><svg class="icon"><use href="#i-pin"></use></svg><span th:text="${event.location}">Place</span></span>
+                    </div>
+                    <div class="seats" style="margin-top:auto">
+                        <div class="small"><span class="muted">Seats left</span><strong th:text="${event.seatsLeft} + ' / ' + ${event.capacity}">20 / 30</strong></div>
+                        <div th:replace="~{fragments/ui :: progress(${event.registeredCount * 100 / event.capacity}, 'coral thin')}"></div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="badge badge-success" th:if="${registered}">You're registered</span>
+                    <span class="badge badge-danger" th:if="${!registered and event.full}">Fully booked</span>
+                    <span th:if="${!registered and !event.full}" class="muted small">Free entry</span>
+                    <form method="post" action="/events/register" th:if="${!registered and !event.full}">
+                        <input th:replace="~{fragments/ui :: csrf}">
+                        <input type="hidden" name="eventId" th:value="${event.id}">
+                        <button type="submit" class="btn btn-primary btn-sm">Register<svg class="icon"><use href="#i-arrow"></use></svg></button>
+                    </form>
+                    <div class="row" style="gap:.4rem" th:if="${registered}">
+                        <a href="/panel/events" class="btn btn-sm">My ticket</a>
+                        <form method="post" action="/events/unregister"
+                              th:attr="data-confirm='Cancel your registration for ' + ${event.title} + '? Your seat will be released.'">
+                            <input th:replace="~{fragments/ui :: csrf}">
+                            <input type="hidden" name="eventId" th:value="${event.id}">
+                            <button type="submit" class="btn btn-sm btn-danger" aria-label="Cancel registration"><svg class="icon"><use href="#i-x"></use></svg></button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        </div>
+        <div class="card" th:if="${#lists.isEmpty(events)}">
+            <div th:replace="~{fragments/ui :: empty('calendar', 'No upcoming events', 'Our team is planning the next ones - check back soon.')}"></div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

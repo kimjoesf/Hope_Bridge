@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<!--
+    Shell of the User Control Panel: sidebar on the left, top bar, then the page.
+    <html th:replace="~{layouts/panel :: layout('My donations', ~{::section})}"> ... <section class="page">...</section> </html>
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head th:replace="~{fragments/head :: head(${title})}"></head>
+<body>
+<svg th:replace="~{fragments/icons :: sprite}"></svg>
+<div th:replace="~{fragments/ui :: flash}"></div>
+<div class="panel" id="panel">
+    <aside th:replace="~{fragments/nav :: sidebar}"></aside>
+    <div class="panel-main">
+        <header th:replace="~{fragments/nav :: topbar(${title})}"></header>
+        <section th:replace="${content}"></section>
+    </div>
+</div>
+</body>
+</html>

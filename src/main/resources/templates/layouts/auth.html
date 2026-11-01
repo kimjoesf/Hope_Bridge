@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!--
+    Split-screen shell for sign in / sign up: a story on the left, the form on the right.
+-->
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head th:replace="~{fragments/head :: head(${title})}"></head>
+<body>
+<svg th:replace="~{fragments/icons :: sprite}"></svg>
+<div th:replace="~{fragments/ui :: flash}"></div>
+<div class="auth">
+    <aside class="auth-aside">
+        <a th:replace="~{fragments/nav :: brand}"></a>
+        <div class="auth-quote">
+            <blockquote>&ldquo;No one has ever become poor by giving.&rdquo;</blockquote>
+            <p>Join the donors and volunteers who turn kindness into meals, classrooms and clean water every single week.</p>
+        </div>
+        <div class="auth-stats">
+            <div><strong>12K+</strong><span>meals served</span></div>
+            <div><strong>850</strong><span>volunteers</span></div>
+            <div><strong>36</strong><span>communities</span></div>
+        </div>
+    </aside>
+    <main class="auth-main">
+        <div th:replace="${content}"></div>
+    </main>
+</div>
+</body>
+</html>
