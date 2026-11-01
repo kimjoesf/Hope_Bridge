@@ -52,9 +52,3 @@ Settings (port, connection string, SQL login instead of Windows auth) live in
 4. *As a donor or volunteer, I want official documents* → printable tax receipts and volunteer certificates (Print / Save as PDF).
 
 ---
-
-## Ready for Phase 2
-- **State** → `DonationStatus` (pending check → cleared, awaiting drop-off → received).
-- **Adapter** → real SMTP / SMS / social / payment gateways behind `CommunicationStrategy` and `DonationMethod` (Payment Module).
-- **Proxy** → replace `requireRole(...)` checks with a protection proxy; **Admin Pages** grow from the Staff area.
-- **Facade** over the services, **Command** for panel actions, **Template Method** for receipts/certificates/reports, **Iterator** for custom collections.
